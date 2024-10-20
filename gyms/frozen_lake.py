@@ -7,6 +7,7 @@ import os
 from matplotlib.patches import FancyArrowPatch
 import time
 
+
 class FrozenLakeEnvJP(FrozenLakeEnv):
     # Construct the path to the image files
     base_path = os.path.dirname(__file__)
@@ -15,8 +16,8 @@ class FrozenLakeEnvJP(FrozenLakeEnv):
     path_entrance_img = os.path.join(base_path, "material/frozen_lake/entrance.jpg")
     path_goal_img = os.path.join(base_path, "material/frozen_lake/goal.jpg")
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         # Load the custom images
         self.player_img = Image.open(self.__class__.path_player_img).resize((40, 40))
@@ -155,10 +156,8 @@ class FrozenLakeEnvJP(FrozenLakeEnv):
         fig.suptitle(f"Episode: {kwargs.get('episode_number', None)}, Step: {kwargs.get('step_number', None)}",
                      fontsize=16)
 
-
         # Show the plot
         display(plt.gcf())
-
 
         # print(state_action_matrix)
         # time.sleep(3)

@@ -5,8 +5,8 @@ from gym.envs.classic_control.cartpole import CartPoleEnv
 
 class CartPoleEnvJP(CartPoleEnv):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.viewer = None  # Initialize the viewer as None
         self.render_mode = 'rgb_array'  # Set the render mode to 'human'
 
