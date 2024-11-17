@@ -75,8 +75,14 @@ class FrozenLakeEnvJP(FrozenLakeEnv):
         clear_output(wait=True)
         plt.close()
 
-    # Function to render the environment map and the state value matrix with arrows
     def render2(self, state_action_matrix, **kwargs):
+        """
+        Function to render
+            - the environment map
+            - the state value matrix with arrows
+        """
+    
+
         # Get the grid layout (env.desc stores the grid description)
         grid_array = np.array(self.desc, dtype='str')
 
