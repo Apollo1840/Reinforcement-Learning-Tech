@@ -5,10 +5,11 @@ from tqdm import tqdm
 
 class Play():
 
-    def __init__(self, env, strategy, num_steps=100):
+    def __init__(self, env, strategy, num_steps=100, reward_mapping=None):
         self.env = env
         self.strategy = strategy
         self.num_steps = num_steps
+        self.reward_mapping = reward_mapping  # Optional: mapping from rewards to custom values (e.g., for FrozenLakeV1)
 
     def run(self, num_episodes=30, is_render=True, verbose=True):
 
@@ -29,6 +30,9 @@ class Play():
 
             for step in range(self.num_steps):
                 next_state, reward, done, truncated, info = self.env.step(action)  # Apply the action to the environment
+
+                if self.reward_mapping:
+                    reward = self.reward_mapping(next_state, reward, done, truncated, info)
 
                 # Update the Q-Learning state-action matrix
                 next_action = self.strategy.step(state, action, reward, next_state, done)

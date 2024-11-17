@@ -1,6 +1,7 @@
 import numpy as np
 import random
 
+
 class SARSA:
 
     def __init__(self, env, learning_rate=0.1, discount_factor=0.99, exploration_rate=1.0, exploration_decay=0.99):
@@ -34,8 +35,7 @@ class SARSA:
         self.state_action_matrix[state, action] += self.learning_rate * td_delta
 
         # Decay exploration rate
-        if done and reward>0:
+        if done and reward > 0:
             self.exploration_rate *= self.exploration_decay
 
         return next_action
-
