@@ -34,7 +34,7 @@ class SARSA:
         self.state_action_matrix[state, action] += self.learning_rate * td_delta
 
         # Decay exploration rate
-        if done:
+        if done and reward>0:
             self.exploration_rate *= self.exploration_decay
 
         return next_action

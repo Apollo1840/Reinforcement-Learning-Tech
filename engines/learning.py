@@ -1,6 +1,8 @@
 import time
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+
+
 class Play():
 
     def __init__(self, env, strategy, num_steps=100):
@@ -8,7 +10,7 @@ class Play():
         self.strategy = strategy
         self.num_steps = num_steps
 
-    def run(self, num_episodes=30, is_render=True):
+    def run(self, num_episodes=30, is_render=True, verbose=True):
 
         # Track the rewards per episode (optional)
         total_rewards = []
@@ -41,13 +43,15 @@ class Play():
 
                 total_reward += reward  # Accumulate the reward
 
-                if done:
-                    print(f"Episode {episode + 1} done in {step + 1} steps with total reward: {total_reward}")
-                    time.sleep(1)
-                    break
-                if truncated:
-                    print(f"Episode {episode + 1} finished in {step + 1} steps with total reward: {total_reward}")
-                    time.sleep(1)
+                if verbose:
+                    if done:
+                        print(f"Episode {episode + 1} done in {step + 1} steps with total reward: {total_reward}")
+                        time.sleep(1)
+                    if truncated:
+                        print(f"Episode {episode + 1} finished in {step + 1} steps with total reward: {total_reward}")
+                        time.sleep(1)
+
+                if done or truncated:
                     break
 
             # Log the total reward for this episode
@@ -99,7 +103,6 @@ class Play():
         # Close the environment
         self.env.close()
 
-
     # for tutorial
     def run_single(self, num_steps=100):
 
@@ -132,4 +135,3 @@ class Play():
 
         # Close the environment
         self.env.close()
-
