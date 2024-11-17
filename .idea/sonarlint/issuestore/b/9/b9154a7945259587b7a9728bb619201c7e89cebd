@@ -1,0 +1,7 @@
+
+dpython:S117"MRename this parameter "V" to match the regular expression ^[_a-z][a-z0-9_]*$.(áëÙÿ
+rpython:S117,"VRename this local variable "Z_ace" to match the regular expression ^[_a-z][a-z0-9_]*$.(ÝÌÚ„øÿÿÿÿ
+tpython:S117+"XRename this local variable "Z_noace" to match the regular expression ^[_a-z][a-z0-9_]*$.(æŸµäøÿÿÿÿ
+dpython:S117."MRename this parameter "X" to match the regular expression ^[_a-z][a-z0-9_]*$.(¢þ–ò
+dpython:S117."MRename this parameter "Y" to match the regular expression ^[_a-z][a-z0-9_]*$.(¢þ–ò
+dpython:S117."MRename this parameter "Z" to match the regular expression ^[_a-z][a-z0-9_]*$.(¢þ–ò
