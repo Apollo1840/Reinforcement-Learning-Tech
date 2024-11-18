@@ -53,7 +53,7 @@ class PolicyGradient:
             action_probs = self.model(states)
             selected_action_probs = tf.reduce_sum(
                 tf.one_hot(actions, self.action_space) * action_probs, axis=1
-            )
+            ) + 1e-10
             loss = -tf.reduce_mean(tf.math.log(selected_action_probs) * discounted_rewards)
 
         grads = tape.gradient(loss, self.model.trainable_variables)
