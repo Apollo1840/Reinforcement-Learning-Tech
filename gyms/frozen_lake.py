@@ -77,62 +77,80 @@ class FrozenLakeEnvJP(FrozenLakeEnv):
 
     def render2(self, state_action_matrix, **kwargs):
         """
-        Function to render
+        Function to render:
             - the environment map
             - the state value matrix with arrows
         """
-    
-
-        # Get the grid layout (env.desc stores the grid description)
         grid_array = np.array(self.desc, dtype='str')
-
-        # Get the agent's position (env.s gives the current state as a flat index)
         player_position = self.s
+        grid_size = grid_array.shape[0]
 
-        # Convert the flat position to 2D coordinates (row, col)
+        # Create a figure with two subplots
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
+        # Render the environment map
+        render_map(ax1, grid_array, player_position, self.player_img, self.hole_img, self.goal_img)
+
+        # Render the state-action value matrix
+        render_state_action_matrix(ax2, state_action_matrix, grid_size)
+
+        # Set the title for the overall plot
+        fig.suptitle(f"Episode: {kwargs.get('episode_number', None)}, Step: {kwargs.get('step_number', None)}",
+                     fontsize=16)
+
+        # Show the plot
+        display(plt.gcf())
+        clear_output(wait=True)
+        plt.close()
+
+    @staticmethod
+    def render_map(ax, grid_array, player_position, player_img, hole_img, goal_img):
+        """
+        Render the environment map on the given axes.
+        """
         grid_size = grid_array.shape[0]
         player_row = player_position // grid_size
         player_col = player_position % grid_size
 
-        # Create a figure with two subplots: one for the environment, one for the state value matrix
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))  # Two side-by-side subplots
-
-        # Plot the environment map in the first subplot (ax1)
         for row in range(grid_size):
             for col in range(grid_size):
-                ax = ax1.inset_axes([col / grid_size, (grid_size - 1 - row) / grid_size, 1 / grid_size, 1 / grid_size])
+                cell_ax = ax.inset_axes(
+                    [col / grid_size, (grid_size - 1 - row) / grid_size, 1 / grid_size, 1 / grid_size])
 
-                # Render different tiles based on the grid content
+                # Render tiles based on the grid content
                 if grid_array[row, col] == 'S':  # Start/Entrance
-                    ax.imshow(np.ones((40, 40, 3)))
-                elif grid_array[row, col] == 'F':  # Frozen tile (safe to walk)
-                    ax.imshow(np.ones((40, 40, 3)))  # Render white tile (a blank white plate)
+                    cell_ax.imshow(np.ones((40, 40, 3)))
+                elif grid_array[row, col] == 'F':  # Frozen tile
+                    cell_ax.imshow(np.ones((40, 40, 3)))
                 elif grid_array[row, col] == 'H':  # Hole
-                    ax.imshow(self.hole_img)
+                    cell_ax.imshow(hole_img)
                 elif grid_array[row, col] == 'G':  # Goal
-                    ax.imshow(self.goal_img)
+                    cell_ax.imshow(goal_img)
 
                 # Hide axis ticks for each grid cell
-                ax.set_xticks([])  # Hide x-axis ticks
-                ax.set_yticks([])  # Hide y-axis ticks
+                cell_ax.set_xticks([])
+                cell_ax.set_yticks([])
 
-        # Overlay the player image on the player's position
-        player_ax = ax1.inset_axes(
+        # Overlay the player image
+        player_ax = ax.inset_axes(
             [player_col / grid_size, (grid_size - 1 - player_row) / grid_size, 1 / grid_size, 1 / grid_size])
-        player_ax.imshow(self.player_img)
-        player_ax.set_xticks([])  # Hide x-axis ticks
-        player_ax.set_yticks([])  # Hide y-axis ticks
+        player_ax.imshow(player_img)
+        player_ax.set_xticks([])
+        player_ax.set_yticks([])
 
-        # Plot the state value matrix in the second subplot (ax2)
+    @staticmethod
+    def render_state_action_matrix(ax, state_action_matrix, grid_size=4):
+        """
+        Render the state-action value matrix with arrows indicating the best action.
+        """
         state_values = np.max(state_action_matrix, axis=1).reshape(grid_size, grid_size)  # max(Q(s, a)) for each state
+        cax = ax.imshow(state_values, cmap='viridis', interpolation='none')
+        plt.colorbar(cax, ax=ax)  # Add a color bar to indicate value scale
 
-        cax = ax2.imshow(state_values, cmap='viridis', interpolation='none')
-        fig.colorbar(cax, ax=ax2)  # Add a color bar to indicate value scale
-
-        # Add labels and formatting for the state value matrix
-        ax2.set_title("State Value Matrix (max(Q(s,a)))")
-        ax2.set_xticks([])  # Hide x-axis ticks
-        ax2.set_yticks([])  # Hide y-axis ticks
+        # Add labels and formatting
+        ax.set_title("State Value Matrix (max(Q(s,a)))")
+        ax.set_xticks([])
+        ax.set_yticks([])
 
         # Add arrows pointing to the best action
         for state in range(state_action_matrix.shape[0]):
@@ -146,27 +164,14 @@ class FrozenLakeEnvJP(FrozenLakeEnv):
 
             # Add an arrow in the direction of the best action
             if best_action == 0:  # Left
-                ax2.add_patch(FancyArrowPatch((start_x + 0.2, start_y), (start_x - 0.2, start_y), mutation_scale=15,
-                                              color='white', lw=2))
+                ax.add_patch(FancyArrowPatch((start_x + 0.2, start_y), (start_x - 0.2, start_y), mutation_scale=15,
+                                             color='white', lw=2))
             elif best_action == 1:  # Down
-                ax2.add_patch(FancyArrowPatch((start_x, start_y - 0.2), (start_x, start_y + 0.2), mutation_scale=15,
-                                              color='white', lw=2))
+                ax.add_patch(FancyArrowPatch((start_x, start_y - 0.2), (start_x, start_y + 0.2), mutation_scale=15,
+                                             color='white', lw=2))
             elif best_action == 2:  # Right
-                ax2.add_patch(FancyArrowPatch((start_x - 0.2, start_y), (start_x + 0.2, start_y), mutation_scale=15,
-                                              color='white', lw=2))
+                ax.add_patch(FancyArrowPatch((start_x - 0.2, start_y), (start_x + 0.2, start_y), mutation_scale=15,
+                                             color='white', lw=2))
             elif best_action == 3:  # Up
-                ax2.add_patch(FancyArrowPatch((start_x, start_y + 0.2), (start_x, start_y - 0.2), mutation_scale=15,
-                                              color='white', lw=2))
-
-        # Set the title for the overall plot
-        fig.suptitle(f"Episode: {kwargs.get('episode_number', None)}, Step: {kwargs.get('step_number', None)}",
-                     fontsize=16)
-
-        # Show the plot
-        display(plt.gcf())
-
-        # print(state_action_matrix)
-        # time.sleep(3)
-
-        clear_output(wait=True)
-        plt.close()
+                ax.add_patch(FancyArrowPatch((start_x, start_y + 0.2), (start_x, start_y - 0.2), mutation_scale=15,
+                                             color='white', lw=2))

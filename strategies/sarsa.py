@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 
 class SARSA:
@@ -39,3 +40,9 @@ class SARSA:
             self.exploration_rate *= self.exploration_decay
 
         return next_action
+
+    def show_state_action_matrix(self):
+        plt.imshow(self.state_action_matrix)
+        plt.xlabel("action")
+        plt.ylabel("state")
+        plt.show()
