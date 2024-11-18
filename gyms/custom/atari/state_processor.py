@@ -1,10 +1,12 @@
 import numpy as np
 import tensorflow as tf
 
+
 class StateProcessor():
     """
     Processes a raw Atari iamges. Resizes it and converts it to grayscale.
     """
+
     def __init__(self):
         # Build the Tensorflow graph
         with tf.variable_scope("state_processor"):
@@ -25,4 +27,4 @@ class StateProcessor():
             A processed [84, 84, 1] state representing grayscale values.
         """
         sess = sess or tf.get_default_session()
-        return sess.run(self.output, { self.input_state: state })
+        return sess.run(self.output, {self.input_state: state})

@@ -56,8 +56,11 @@ class PolicyGradient:
             ) + 1e-10
             loss = -tf.reduce_mean(tf.math.log(selected_action_probs) * discounted_rewards)
 
+        # print("Log(selected_action_probs):", tf.math.log(selected_action_probs).numpy())
+        # print("Loss before mean:", (tf.math.log(selected_action_probs) * discounted_rewards).numpy())
+        # print("Loss:", loss.numpy())
         grads = tape.gradient(loss, self.model.trainable_variables)
-        self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
+        # self.optimizer.apply_gradients(zip(grads, self.model.trainable_variables))
         self.memory = []  # Clear memory after training
 
     def _discount_rewards(self, rewards):
@@ -67,36 +70,38 @@ class PolicyGradient:
         for t in reversed(range(len(rewards))):
             cumulative = cumulative * self.gamma + rewards[t]
             discounted_rewards[t] = cumulative
-        return (discounted_rewards - np.mean(discounted_rewards)) / np.std(discounted_rewards)
+
+        # Safe normalization
+        mean = np.mean(discounted_rewards)
+        std = np.std(discounted_rewards)
+        if std == 0:
+            std = 1e-10  # Prevent division by zero
+        discounted_rewards = (discounted_rewards - mean) / std
+        return discounted_rewards
 
 
-# Training the Policy Gradient agent on FrozenLake
-if __name__ == "__main__":
-    env = gym.make('FrozenLake-v1', is_slippery=False)  # Use deterministic environment for simplicity
-    state_space = env.observation_space.n
-    action_space = env.action_space.n
+if __name__ == '__main__':
+    env = FrozenLakeEnvJP(is_slippery=True)
+    strategy = PolicyGradient(env)
 
-    # Create the agent
-    agent = PolicyGradient(state_space, action_space)
-
-    episodes = 1000
+    episodes = 10000
     success_rate = []
 
-    for episode in range(episodes):
+    for episode in tqdm(range(episodes)):
         state = env.reset()
-        state = np.eye(state_space)[state]  # One-hot encode state
+        state = np.eye(strategy.state_space)[state[0]]  # One-hot encode state
         total_reward = 0
 
         while True:
-            action = agent.act(state)
-            next_state, reward, done, _ = env.step(action)
-            next_state = np.eye(state_space)[next_state]  # One-hot encode next state
-            agent.step(state, action, reward)
+            action = strategy.act(state)
+            next_state, reward, done, _, _ = env.step(action)
+            next_state = np.eye(strategy.state_space)[next_state]  # One-hot encode next state
+            strategy.step(state, action, reward)
             state = next_state
             total_reward += reward
 
             if done:
-                agent.train()
+                strategy.train()
                 success_rate.append(total_reward)
                 break
 
