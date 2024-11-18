@@ -16,8 +16,8 @@ class PolicyGradient:
 
         # Build the policy network
         self.model = Sequential([
-            Dense(24, input_dim=state_space, activation='relu'),
-            Dense(action_space, activation='softmax')
+            Dense(24, input_dim=self.state_space, activation='relu'),
+            Dense(self.action_space, activation='softmax')
         ])
         self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
         self.memory = []  # Store (state, action, reward)
