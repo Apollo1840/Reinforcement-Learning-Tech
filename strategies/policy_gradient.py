@@ -54,6 +54,8 @@ class PolicyGradient:
             selected_action_probs = tf.reduce_sum(
                 tf.one_hot(actions, self.action_space) * action_probs, axis=1
             ) + 1e-10
+            # inside: element-wise multiplication of onehot:(N, A) and probs:(N, A)
+
             loss = -tf.reduce_mean(tf.math.log(selected_action_probs) * discounted_rewards)
 
         # print("Log(selected_action_probs):", tf.math.log(selected_action_probs).numpy())
